@@ -1,18 +1,22 @@
-import {within, waitForElementToBeRemoved} from '@testing-library/react'
-import ReactDOM from 'react-dom'
+import {
+  screen,
+  waitForElementToBeRemoved,
+  fireEvent,
+} from '@testing-library/react'
 
-test('booting up the app from the index file does not break anything', async () => {
-  // setup
-  const div = document.createElement('div')
-  div.setAttribute('id', 'root')
-  document.body.appendChild(div)
+beforeAll(() => {
+  const root = document.createElement('div')
+  root.id = 'root'
+  document.body.append(root)
+})
 
-  // run the file and wait for things to settle.
-  require('..')
-  const {getByLabelText} = within(document.body)
-  await waitForElementToBeRemoved(() => getByLabelText(/loading/i))
+test('renders the book search', async () => {
+  require('../index')
 
-  // cleanup
-  ReactDOM.unmountComponentAtNode(div)
-  document.body.removeChild(div)
+  fireEvent.change(screen.getByPlaceholderText(/search/i), {
+    target: {value: 'voice of war'},
+  })
+  fireEvent.click(screen.getByLabelText(/search/i))
+  await waitForElementToBeRemoved(() => screen.getByLabelText(/loading/i))
+  expect(screen.getByText(/voice of war/i)).toBeInTheDocument()
 })
