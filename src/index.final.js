@@ -2,38 +2,28 @@
 /** @jsxFrag React.Fragment */
 import {jsx} from '@emotion/core'
 
+import 'bootstrap/dist/css/bootstrap-reboot.css'
+import '@reach/dialog/styles.css'
 import React from 'react'
+import ReactDOM from 'react-dom'
 import VisuallyHidden from '@reach/visually-hidden'
-import {
-  CircleButton,
-  Button,
-  Spinner,
-  FormGroup,
-  ErrorMessage,
-} from './components/lib'
+import {Button, Input, CircleButton, FormGroup} from './components/lib'
 import {Modal, ModalDismissButton} from './components/modal'
 import {Logo} from './components/logo'
-import {Input} from './components/lib'
-import {useAuth} from './context/auth-context'
-import {useAsync} from './utils/use-async'
 
 function LoginForm({onSubmit, submitButton}) {
-  const {isLoading, isError, error, run} = useAsync()
   function handleSubmit(event) {
     event.preventDefault()
     const {username, password} = event.target.elements
 
-    run(
-      onSubmit({
-        username: username.value,
-        password: password.value,
-      }),
-    )
+    onSubmit({
+      username: username.value,
+      password: password.value,
+    })
   }
 
   return (
     <form
-      onSubmit={handleSubmit}
       css={{
         display: 'flex',
         flexDirection: 'column',
@@ -44,6 +34,7 @@ function LoginForm({onSubmit, submitButton}) {
           maxWidth: '300px',
         },
       }}
+      onSubmit={handleSubmit}
     >
       <FormGroup>
         <label htmlFor="username">Username</label>
@@ -53,17 +44,7 @@ function LoginForm({onSubmit, submitButton}) {
         <label htmlFor="password">Password</label>
         <Input id="password" type="password" />
       </FormGroup>
-      <div>
-        {React.cloneElement(
-          submitButton,
-          {type: 'submit'},
-          ...(Array.isArray(submitButton.props.children)
-            ? submitButton.props.children
-            : [submitButton.props.children]),
-          isLoading ? <Spinner css={{marginLeft: 5}} /> : null,
-        )}
-      </div>
-      {isError ? <ErrorMessage error={error} /> : null}
+      <div>{React.cloneElement(submitButton, {type: 'submit'})}</div>
     </form>
   )
 }
@@ -79,9 +60,23 @@ const circleDismissButton = (
   </div>
 )
 
-function UnauthenticatedApp() {
-  const {login, register} = useAuth()
+function App() {
+  function login(formData) {
+    console.log('login', formData)
+  }
 
+  function register(formData) {
+    console.log('register', formData)
+  }
+
+  // 🐨 this div could use a css prop to get its children rendered nicer
+  // 🎨
+  //    display: 'flex',
+  //    flexDirection: 'column',
+  //    alignItems: 'center',
+  //    justifyContent: 'center',
+  //    width: '100%',
+  //    height: '100vh',
   return (
     <div
       css={{
@@ -129,4 +124,4 @@ function UnauthenticatedApp() {
   )
 }
 
-export default UnauthenticatedApp
+ReactDOM.render(<App />, document.getElementById('root'))
